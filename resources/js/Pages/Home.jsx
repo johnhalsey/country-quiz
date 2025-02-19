@@ -1,19 +1,25 @@
-import { Head, Link } from '@inertiajs/react';
-import PrimaryButton from "@/Components/PrimaryButton.jsx"
+import {Head, Link} from '@inertiajs/react';
+import GuestLayout from "@/Layouts/GuestLayout.jsx"
 
-export default function Home() {
-
+export default function Home () {
 
     return (
         <>
-            <Head title="Country Capitals Quiz" />
+            <GuestLayout
+                title="Capital Cities Quiz"
+            >
+                <Head title="Country Capitals Quiz"/>
 
-            <div className="container">
-                <PrimaryButton>
-                    Start Quiz
-                </PrimaryButton>
-            </div>
+                <p className="text-center mt-8">Think you know your capital cities? Take the test now.</p>
+                <div className="mt-12">
+                    <Link href="quiz"
+                          className="px-5 py-3 flex justify-self-center bg-green-400 hover:bg-green-600 hover:shadow rounded"
+                    >
+                        Start Quiz
+                    </Link>
+                </div>
 
+            </GuestLayout>
         </>
     );
 }
