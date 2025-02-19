@@ -1,9 +1,10 @@
 import {Head, Link} from '@inertiajs/react';
 import GuestLayout from "@/Layouts/GuestLayout.jsx"
 
-export default function Quiz () {
+export default function Quiz ({ quizId }) {
 
     // get quiz question on monuted
+
 
     return (
         <>
@@ -12,7 +13,7 @@ export default function Quiz () {
                 <Head title="Country Capitals Quiz"/>
 
                 <div className="container mx-auto">
-                    Question here
+
                 </div>
             </GuestLayout>
 
