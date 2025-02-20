@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Session;
 
 class QuizController extends Controller
 {
-    public function index()
+    public function start()
     {
         // start a session
         $id = 'quiz-' . Carbon::now()->timestamp;
