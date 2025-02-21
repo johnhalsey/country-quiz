@@ -5,27 +5,39 @@ namespace App\Http\Controllers\Api;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Session;
 use App\Contracts\CountryServiceInterface;
+use App\Exceptions\CouldNotGetCapitalsException;
 
 class QuestionController extends Controller
 {
     public function get(Request $request, $quizId)
     {
         $service = App::make(CountryServiceInterface::class);
-        $capitals = $service->getCapitalsForQuiz($quizId);
+        try{
+            $allCountries = $service->getAllCountries($quizId);
+        } catch (CouldNotGetCapitalsException $e){
+            abort(500, 'Could not get capitals');
+        }
 
-        $country = $capitals[0];
+        $questionCountry = $service->pickCountryForQuiz($quizId, $allCountries);
+        $randomOptions = $service->pickRandomCapitals($allCountries, $questionCountry['name'], 2);
+
+        $sessionCountries = Session::get($quizId);
+        $sessionCountries[] = $questionCountry['name'];
+        Session::put($quizId, $sessionCountries);
+
         $options = [
             [
-                'capital' => $capitals[0]['capital'],
+                'capital' => $questionCountry['capital'],
                 'correct' => true,
             ],
             [
-                'capital' => $capitals[1]['capital'],
+                'capital' => $randomOptions[0]['capital'],
                 'correct' => false,
             ],
             [
-                'capital' => $capitals[2]['capital'],
+                'capital' => $randomOptions[1]['capital'],
                 'correct' => false,
             ]
         ];
@@ -33,7 +45,7 @@ class QuestionController extends Controller
         shuffle($options);
 
         return response()->json([
-            'country' => $country['name'],
+            'country' => $questionCountry['name'],
             'options' => $options
         ]);
     }

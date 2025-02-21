@@ -2,7 +2,18 @@
 
 namespace App\Contracts;
 
+use App\Exceptions\CouldNotGetCapitalsException;
+
 interface CountryServiceInterface
 {
-    public function getCapitalsForQuiz(string $quizId, int $count = 3);
+    /**
+     * @param string $quizId
+     * @return array
+     * @throws CouldNotGetCapitalsException
+     */
+    public function getAllCountries(string $quizId): array;
+
+    public function pickCountryForQuiz(string $quizId, array $countries): array;
+
+    public function pickRandomCapitals(array $countries, string $exludingCountry, int $count = 2): array;
 }
