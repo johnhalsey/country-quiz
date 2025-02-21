@@ -31,16 +31,15 @@ class QuestionController extends Controller
             [
                 'capital' => $questionCountry['capital'],
                 'correct' => true,
-            ],
-            [
-                'capital' => $randomOptions[0]['capital'],
-                'correct' => false,
-            ],
-            [
-                'capital' => $randomOptions[1]['capital'],
-                'correct' => false,
             ]
         ];
+
+        foreach ($randomOptions as $option) {
+            $options[] = [
+                'capital' => $option['capital'] == '' ? 'No capital' : $option['capital'],
+                'correct' => false,
+            ];
+        }
 
         shuffle($options);
 

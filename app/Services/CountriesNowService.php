@@ -50,6 +50,10 @@ class CountriesNowService implements CountryServiceInterface
             for ($i = 0; $i < count($countries); $i++) {
                 if (in_array($countries[$i]['name'], Session::get($quizId))) {
                     unset($countries[$i]);
+                    continue;
+                }
+                if ($countries[$i]['capital'] == '') {
+                    unset($countries[$i]);
                 }
             }
         }
@@ -60,12 +64,16 @@ class CountriesNowService implements CountryServiceInterface
 
     public function pickRandomCapitals(array $cuntries, string $exludingCountry, int $count = 2): array
     {
-        $filteredCountries = array_filter($cuntries, function ($item) use ($exludingCountry) {
-            return $item['name'] !== $exludingCountry;
-        });
+        for($i = 0; $i < count($cuntries); $i++) {
+            if ($cuntries[$i]['name'] == $exludingCountry) {
+                unset($cuntries[$i]);
+                break;
+            }
 
-        shuffle($filteredCountries);
-        return array_slice($filteredCountries, 0, $count, true);
+        }
+
+        shuffle($cuntries);
+        return array_slice($cuntries, 0, $count, true);
     }
 
 }
