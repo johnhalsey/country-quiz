@@ -27,7 +27,8 @@ class CountriesNowService implements CountryServiceInterface
     {
         try {
             $response = Cache::remember('capitals-' . $quizId, Carbon::now()->addHour(), function () {
-                return $this->adapter->get('capital');
+                $response = $this->adapter->get('capital');
+                return $response->json();
             });
         } catch (RequestException $ex) {
             // putting this log here on purpose to look back on, if it fails.
@@ -35,12 +36,11 @@ class CountriesNowService implements CountryServiceInterface
             throw new CouldNotGetCapitalsException($ex->getMessage());
         }
 
-        $array = $response->json();
-        if ($array['error']) {
+        if ($response['error']) {
             throw new CouldNotGetCapitalsException();
         }
 
-        return $array['data'];
+        return $response['data'];
     }
 
     public function pickCountryForQuiz(string $quizId, array $countries): array
