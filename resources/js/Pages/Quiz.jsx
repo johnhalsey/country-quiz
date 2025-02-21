@@ -52,7 +52,11 @@ export default function Quiz ({quizId}) {
 
     return (
         <>
-            {loading && <div>Loading</div>}
+            {loading && <GuestLayout>
+                <div className="text-center">
+                    <span className="mx-auto block w-16 h-16 border-4 border-t-green-500 border-r-blue-500 border-b-yellow-500 border-l-red-500 border-dotted animate-spin rounded-full"></span>
+                </div>
+            </GuestLayout>}
             {!loading && <GuestLayout
                 title={'What is the capital city of ' + data.country}>
                 <Head title="Country Capitals Quiz"/>
