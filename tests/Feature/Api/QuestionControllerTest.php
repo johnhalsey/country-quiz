@@ -3,12 +3,10 @@
 namespace Tests\Feature\Api;
 
 use Carbon\Carbon;
+use Tests\TestCase;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Session;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
-use Tests\TestCase;
 
 class QuestionControllerTest extends TestCase
 {
