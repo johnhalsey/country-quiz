@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Log;
 use App\Adapters\CountriesNowAdapter;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Session;
@@ -19,15 +18,13 @@ class CountriesNowService implements CountryServiceInterface
     public function getCapitalsForQuiz(string $quizId, int $count = 3)
     {
         try{
-            $response = Cache::remember('capitals-' . $quizId, Carbon::now()->addHour(), function () {
-                return $this->adapter->get('capital');
+            $countries = Cache::remember('capitals-' . $quizId, Carbon::now()->addHour(), function () {
+                $response = $this->adapter->get('capital');
+                return $response->json()['data'];
             });
         } catch (HttpClientException $ex) {
-            // do something here
+            // @TODO throw exception here
         }
-
-        $countries = $response->json()['data'];
-        Log::info($countries);
 
         // filter out any countries already used in this quiz
         foreach(Session::get($quizId) as $country){
@@ -35,8 +32,6 @@ class CountriesNowService implements CountryServiceInterface
                 return $item['name'] === $country;
             });
         }
-        Log::info('-------------');
-        Log::info($countries);
 
         shuffle($countries);
         return array_slice($countries, 0, $count, true);
