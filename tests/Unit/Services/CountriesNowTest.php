@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Http;
 use App\Services\CountriesNowService;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Session;
+use App\Exceptions\CouldNotGetCapitalsException;
 
 class CountriesNowTest extends TestCase
 {
@@ -50,6 +51,40 @@ class CountriesNowTest extends TestCase
         $service->getAllCountries($quizId);
 
         Http::assertNothingSent();
+    }
+
+    public function test_it_will_throw_exception_if_http_error()
+    {
+        $this->expectException(CouldNotGetCapitalsException::class);
+
+        Carbon::setTestNow(now());
+        Cache::flush();
+        $quizId = 'quiz-' . Carbon::now()->timestamp;
+
+        Http::fake([
+            '*' => Http::response([], 500)
+        ]);
+
+        $service = App::make(CountriesNowService::class);
+        $countries = $service->getAllCountries($quizId);
+    }
+
+    public function test_it_will_throw_exception_on_response_error()
+    {
+        $this->expectException(CouldNotGetCapitalsException::class);
+
+        Carbon::setTestNow(now());
+        Cache::flush();
+        $quizId = 'quiz-' . Carbon::now()->timestamp;
+
+        Http::fake([
+            '*' => Http::response([
+                'error' => true,
+            ], 500)
+        ]);
+
+        $service = App::make(CountriesNowService::class);
+        $countries = $service->getAllCountries($quizId);
     }
 
     public function test_it_pick_country_for_quiz()
