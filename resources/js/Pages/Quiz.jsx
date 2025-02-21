@@ -73,10 +73,10 @@ export default function Quiz ({quizId}) {
                                 >
                                     <div className="flex justify-between grow">
                                         <span className="ml-6">{option.capital}</span>
-                                        {selected && selected == option.capital && <span className="mr-12">
+                                        {selected && selected == option.capital && <span className="mr-5 md:mr-12">
                                             {option.correct && "Correct  ✅"}
 
-                                            {!option.correct && "Not Quite, try again!"}
+                                            {!option.correct && "Not quite, try again!"}
                                         </span>}
                                     </div>
 
