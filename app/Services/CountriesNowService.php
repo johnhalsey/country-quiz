@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\Session;
 use App\Contracts\CountryServiceInterface;
 use Illuminate\Http\Client\RequestException;
 use App\Exceptions\CouldNotGetCapitalsException;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class CountriesNowService implements CountryServiceInterface
 {
@@ -25,22 +24,27 @@ class CountriesNowService implements CountryServiceInterface
      */
     public function getAllCountries(string $quizId): array
     {
-        try {
-            $response = Cache::remember('capitals-' . $quizId, Carbon::now()->addHour(), function () {
+        if (Cache::has('capitals-' . $quizId)) {
+            $body = Cache::get('capitals-' . $quizId);
+        } else {
+            try {
                 $response = $this->adapter->get('capital');
-                return $response->json();
-            });
-        } catch (RequestException $ex) {
-            // putting this log here on purpose to look back on, if it fails.
-            Log::error($ex->getMessage());
-            throw new CouldNotGetCapitalsException($ex->getMessage());
+                $body = $response->json();
+            } catch (RequestException $ex) {
+                // putting this log here on purpose to look back on, if it fails.
+                Log::error($ex->getMessage());
+                throw new CouldNotGetCapitalsException($ex->getMessage());
+            }
         }
 
-        if ($response['error']) {
+        if ($body['error']) {
             throw new CouldNotGetCapitalsException();
         }
 
-        return $response['data'];
+        // the request was good, lets cache it now for an hour
+        Cache::put('capitals-' . $quizId, $body, Carbon::now()->addHour());
+
+        return $body['data'];
     }
 
     public function pickCountryForQuiz(string $quizId, array $countries): array
@@ -64,7 +68,7 @@ class CountriesNowService implements CountryServiceInterface
 
     public function pickRandomCapitals(array $cuntries, string $exludingCountry, int $count = 2): array
     {
-        for($i = 0; $i < count($cuntries); $i++) {
+        for ($i = 0; $i < count($cuntries); $i++) {
             if ($cuntries[$i]['name'] == $exludingCountry) {
                 unset($cuntries[$i]);
                 break;

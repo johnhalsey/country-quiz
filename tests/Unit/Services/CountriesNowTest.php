@@ -43,8 +43,7 @@ class CountriesNowTest extends TestCase
             'error' => false,
             'data' => []
         ]);
-
-
+        
         Http::fake();
 
         $service = App::make(CountriesNowService::class);
@@ -85,6 +84,24 @@ class CountriesNowTest extends TestCase
 
         $service = App::make(CountriesNowService::class);
         $countries = $service->getAllCountries($quizId);
+    }
+
+    public function test_it_will_not_cache_api_response_on_error()
+    {
+        $this->expectException(CouldNotGetCapitalsException::class);
+
+        Carbon::setTestNow(now());
+        Cache::flush();
+        $quizId = 'quiz-' . Carbon::now()->timestamp;
+
+        Http::fake([
+            '*' => Http::response([], 500)
+        ]);
+
+        $service = App::make(CountriesNowService::class);
+        $service->getAllCountries($quizId);
+
+        $this->assertFalse(Cache::has('capitals-' . $quizId));
     }
 
     public function test_it_pick_country_for_quiz()
