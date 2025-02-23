@@ -22,6 +22,12 @@ export default function Quiz ({quizId}) {
         setError(false)
         axios.get('api/quiz/' + quizId + '/question')
             .then(response => {
+                // check if we're being redirected
+                if (response.data.redirect) {
+                    console.log(response.data.redirect)
+                    window.location.href = response.data.redirect
+                }
+
                 setData(response.data)
             })
             .catch(error => {

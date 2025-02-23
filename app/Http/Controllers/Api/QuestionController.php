@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\App;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Session;
@@ -12,7 +13,7 @@ use App\Exceptions\NoMoreCountriesForQuizException;
 
 class QuestionController extends Controller
 {
-    public function get(Request $request, $quizId)
+    public function get(Request $request, $quizId): JsonResponse
     {
         $service = App::make(CountryServiceInterface::class);
         try{

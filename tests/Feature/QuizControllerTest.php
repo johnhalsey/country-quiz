@@ -37,4 +37,24 @@ class QuizControllerTest extends TestCase
 
         $this->assertEquals([], Session::get($quizId));
     }
+
+    public function test_it_will_remove_the_session_id_when_test_complete()
+    {
+        // stop time
+        Carbon::setTestNow(now());
+
+        $quizId = 'quiz-' . Carbon::now()->timestamp;
+
+        Session::put($quizId, []);
+
+        $this->assertNotNull(Session::get($quizId));
+
+        $response = $this->call('GET', '/quiz/' . $quizId . '/complete')
+            ->assertStatus(200)
+            ->assertInertia(fn (AssertableInertia $page) => $page
+                ->component('Complete')
+            );
+
+        $this->assertNull(Session::get($quizId));
+    }
 }
