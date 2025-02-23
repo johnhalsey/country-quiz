@@ -26,12 +26,20 @@ class QuestionController extends Controller
         } catch (NoMoreCountriesForQuizException $e){
             // send the user to the complete page
             return response()->json([
-                'reditect' => route('quiz.complete', $quizId)
+                'redirect' => route('quiz.complete', $quizId)
             ]);
         }
 
         $randomOptions = $service->pickRandomCapitals($allCountries, $questionCountry['name'], 2);
 
+        return response()->json([
+            'country' => $questionCountry['name'],
+            'options' => $this->formatQuestionOptions($quizId, $questionCountry, $randomOptions)
+        ]);
+    }
+
+    private function formatQuestionOptions(string $quizId, array $questionCountry, array $randomOptions): array
+    {
         $sessionCountries = Session::get($quizId);
         $sessionCountries[] = $questionCountry['name'];
         Session::put($quizId, $sessionCountries);
@@ -52,9 +60,6 @@ class QuestionController extends Controller
 
         shuffle($options);
 
-        return response()->json([
-            'country' => $questionCountry['name'],
-            'options' => $options
-        ]);
+        return $options;
     }
 }

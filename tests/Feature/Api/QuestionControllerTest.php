@@ -351,7 +351,7 @@ class QuestionControllerTest extends TestCase
             'api/quiz/' . $quizId . '/question'
         )->assertStatus(200)
             ->assertJsonFragment([
-                'reditect' => route('quiz.complete', $quizId)
+                'redirect' => route('quiz.complete', $quizId)
             ]);
     }
 }
