@@ -6,9 +6,10 @@ import PrimaryButton from "@/Components/PrimaryButton.jsx"
 
 export default function Quiz ({quizId}) {
 
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
     const [data, setData] = useState([])
     const [selected, setSelected] = useState(null)
+    const [error, setError] = useState(true)
 
     useEffect(() => {
         getNextQuestion()
@@ -18,14 +19,16 @@ export default function Quiz ({quizId}) {
         setLoading(true)
         setData([])
         setSelected(null)
+        setError(false)
         axios.get('api/quiz/' + quizId + '/question')
             .then(response => {
                 setData(response.data)
-                setLoading(false)
             })
             .catch(error => {
-                console.log('some error')
-                console.log(error.response)
+                setError(true)
+            })
+            .finally(() => {
+                setLoading(false)
             })
     }
 
@@ -48,16 +51,33 @@ export default function Quiz ({quizId}) {
         return match.correct
     }
 
-    // get quiz question on monuted
-
     return (
         <>
             {loading && <GuestLayout>
+                <Head title="Country Capitals Quiz"/>
                 <div className="text-center">
                     <span className="mx-auto block w-16 h-16 border-4 border-t-green-500 border-r-blue-500 border-b-yellow-500 border-l-red-500 border-dotted animate-spin rounded-full"></span>
                 </div>
             </GuestLayout>}
-            {!loading && <GuestLayout
+
+            {!loading && error && <GuestLayout
+                title="There was a problem!"
+                >
+                <Head title="Country Capitals Quiz"/>
+
+                <div className="container mx-auto mt-6">
+                    <div className="mx-auto px-6 lg:px-8 text-center">
+                        Uh oh! There was a problem!  Please try and get the next question again
+
+                    </div>
+
+                    <div className="px-6 lg:px-8 mt-12 flex justify-center">
+                        <PrimaryButton onClick={getNextQuestion}>Next Question</PrimaryButton>
+                    </div>
+                </div>
+            </GuestLayout>}
+
+            {!loading && !error && <GuestLayout
                 title={'What is the capital city of ' + data.country}>
                 <Head title="Country Capitals Quiz"/>
 
@@ -92,8 +112,6 @@ export default function Quiz ({quizId}) {
 
                 {/* buttons for next and finish */}
             </GuestLayout>}
-
-
         </>
     );
 }
