@@ -27,4 +27,4 @@ It then provides the user with a country and 3 possible options for them to sele
 
 Once the countries data has been retrieved once for each quiz starting, the dataset is cached for an hour so as not to keep hitting the countriesnow url.  This also speeds up the experience for the user.
 
-This was part of a coding test, the full instructions can be found [here](software-engineer-php-v4.docx). 
+This was part of a coding test, the full instructions can be found [here](software-engineer-php-v4.pdf). 
