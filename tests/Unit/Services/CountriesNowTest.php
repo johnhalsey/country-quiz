@@ -10,6 +10,7 @@ use App\Services\CountriesNowService;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Session;
 use App\Exceptions\CouldNotGetCapitalsException;
+use App\Exceptions\NoMoreCountriesForQuizException;
 
 class CountriesNowTest extends TestCase
 {
@@ -43,7 +44,7 @@ class CountriesNowTest extends TestCase
             'error' => false,
             'data' => []
         ]);
-        
+
         Http::fake();
 
         $service = App::make(CountriesNowService::class);
@@ -198,5 +199,71 @@ class CountriesNowTest extends TestCase
         $counties = $service->pickRandomCapitals($countries, 'Andorra', 6);
         $this->assertTrue(!in_array('Andorra', $counties));
         $this->assertCount(6, $counties);
+    }
+
+    public function test_it_will_throw_excdption_when_picking_country_if_no_countries_left()
+    {
+        $this->expectException(NoMoreCountriesForQuizException::class);
+
+        $quizId = 'quiz-' . Carbon::now()->timestamp;
+
+        Session::put($quizId, [
+                'Afghanistan',
+                'Aland Islands',
+                'Albania',
+                'Algeria',
+                'Andorra',
+                'Angola',
+                'Anguilla',
+            ]
+        );
+
+        $countries = [
+            [
+                "name"    => "Afghanistan",
+                "capital" => "Kabul",
+                "iso2"    => "AF",
+                "iso3"    => "AFG"
+            ],
+            [
+                "name"    => "Aland Islands",
+                "capital" => "Mariehamn",
+                "iso2"    => "AX",
+                "iso3"    => "ALA"
+            ],
+            [
+                "name"    => "Albania",
+                "capital" => "Tirana",
+                "iso2"    => "AL",
+                "iso3"    => "ALB"
+            ],
+            [
+                "name"    => "Algeria",
+                "capital" => "Algiers",
+                "iso2"    => "DZ",
+                "iso3"    => "DZA"
+            ],
+            [
+                "name"    => "Andorra",
+                "capital" => "Andorra la Vella",
+                "iso2"    => "AD",
+                "iso3"    => "AND"
+            ],
+            [
+                "name"    => "Angola",
+                "capital" => "Luanda",
+                "iso2"    => "AO",
+                "iso3"    => "AGO"
+            ],
+            [
+                "name"    => "Anguilla",
+                "capital" => "The Valley",
+                "iso2"    => "AI",
+                "iso3"    => "AIA"
+            ],
+        ];
+
+        $service = App::make(CountriesNowService::class);
+        $service->pickCountryForQuiz($quizId, $countries);
     }
 }

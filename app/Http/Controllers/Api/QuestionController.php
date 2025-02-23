@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Session;
 use App\Contracts\CountryServiceInterface;
 use App\Exceptions\CouldNotGetCapitalsException;
+use App\Exceptions\NoMoreCountriesForQuizException;
 
 class QuestionController extends Controller
 {
@@ -20,7 +21,15 @@ class QuestionController extends Controller
             abort(500, 'Could not get capitals');
         }
 
-        $questionCountry = $service->pickCountryForQuiz($quizId, $allCountries);
+        try{
+            $questionCountry = $service->pickCountryForQuiz($quizId, $allCountries);
+        } catch (NoMoreCountriesForQuizException $e){
+            // send the user to the complete page
+            return response()->json([
+                'reditect' => route('quiz.complete', $quizId)
+            ]);
+        }
+
         $randomOptions = $service->pickRandomCapitals($allCountries, $questionCountry['name'], 2);
 
         $sessionCountries = Session::get($quizId);

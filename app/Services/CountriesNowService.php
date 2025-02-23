@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Session;
 use App\Contracts\CountryServiceInterface;
 use Illuminate\Http\Client\RequestException;
 use App\Exceptions\CouldNotGetCapitalsException;
+use App\Exceptions\NoMoreCountriesForQuizException;
 
 class CountriesNowService implements CountryServiceInterface
 {
@@ -49,17 +50,29 @@ class CountriesNowService implements CountryServiceInterface
 
     public function pickCountryForQuiz(string $quizId, array $countries): array
     {
+        $keysToUnset = [];
+
         // filter out any countries already used in this quiz
         if (Session::has($quizId)) {
             for ($i = 0; $i < count($countries); $i++) {
                 if (in_array($countries[$i]['name'], Session::get($quizId))) {
-                    unset($countries[$i]);
+                    $keysToUnset[] = $i;
                     continue;
                 }
                 if ($countries[$i]['capital'] == '') {
-                    unset($countries[$i]);
+                    $keysToUnset[] = $i;
                 }
             }
+        }
+
+        foreach ($keysToUnset as $key) {
+            unset($countries[$key]);
+        }
+        $countries = array_values($countries);
+
+        if (count($countries) == 0) {
+            // there are no countries left
+            throw new NoMoreCountriesForQuizException();
         }
 
         shuffle($countries);

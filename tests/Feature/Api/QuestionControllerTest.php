@@ -277,4 +277,81 @@ class QuestionControllerTest extends TestCase
                 'message' => 'Could not get capitals',
             ]);
     }
+
+    public function test_it_will_return_redirect_url_if_there_are_no_more_countries_in_quiz()
+    {
+        Cache::flush();
+
+        $quizId = 'quiz-' . Carbon::now()->timestamp;
+
+        Session::put($quizId, [
+                'Afghanistan',
+                'Aland Islands',
+                'Albania',
+                'Algeria',
+                'Andorra',
+                'Angola',
+                'Anguilla',
+            ]
+        );
+
+        Http::fake([
+            'https://countriesnow.space/api/v0.1/countries/capital' => Http::response([
+                'error' => false,
+                'data'  => [
+                    [
+                        "name"    => "Afghanistan",
+                        "capital" => "Kabul",
+                        "iso2"    => "AF",
+                        "iso3"    => "AFG"
+                    ],
+                    [
+                        "name"    => "Aland Islands",
+                        "capital" => "Mariehamn",
+                        "iso2"    => "AX",
+                        "iso3"    => "ALA"
+                    ],
+                    [
+                        "name"    => "Albania",
+                        "capital" => "Tirana",
+                        "iso2"    => "AL",
+                        "iso3"    => "ALB"
+                    ],
+                    [
+                        "name"    => "Algeria",
+                        "capital" => "Algiers",
+                        "iso2"    => "DZ",
+                        "iso3"    => "DZA"
+                    ],
+                    [
+                        "name"    => "Andorra",
+                        "capital" => "Andorra la Vella",
+                        "iso2"    => "AD",
+                        "iso3"    => "AND"
+                    ],
+                    [
+                        "name"    => "Angola",
+                        "capital" => "Luanda",
+                        "iso2"    => "AO",
+                        "iso3"    => "AGO"
+                    ],
+                    [
+                        "name"    => "Anguilla",
+                        "capital" => "The Valley",
+                        "iso2"    => "AI",
+                        "iso3"    => "AIA"
+                    ],
+                    // ... and lots more
+                ]
+            ]),
+        ]);
+
+        $response = $this->json(
+            'GET',
+            'api/quiz/' . $quizId . '/question'
+        )->assertStatus(200)
+            ->assertJsonFragment([
+                'reditect' => route('quiz.complete', $quizId)
+            ]);
+    }
 }
