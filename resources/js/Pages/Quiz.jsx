@@ -24,7 +24,6 @@ export default function Quiz ({quizId}) {
             .then(response => {
                 // check if we're being redirected
                 if (response.data.redirect) {
-                    console.log(response.data.redirect)
                     window.location.href = response.data.redirect
                 }
 
@@ -39,7 +38,6 @@ export default function Quiz ({quizId}) {
     }
 
     const setSelectedAnswer = function(value) {
-        console.log(value)
         setSelected(value)
     }
 
