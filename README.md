@@ -1,6 +1,10 @@
+[![Laravel Forge Site Deployment Status](https://img.shields.io/endpoint?url=https%3A%2F%2Fforge.laravel.com%2Fsite-badges%2F70347a29-983b-48c8-bc18-5084f86e241c&style=plastic)](https://forge.laravel.com/servers/886744/sites/2628407)
+
 # Capital Cities Quiz
 
 Application to test users knowledge of capital cities, built with Laravel & React.js.
+
+a live example of the quiz can be found here [cc-quiz.johnhalsey.co.uk](cc-quiz.johnhalsey.co.uk) 
 
 ## To install locally
 
