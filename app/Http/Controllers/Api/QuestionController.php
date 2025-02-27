@@ -34,11 +34,11 @@ class QuestionController extends Controller
             ]);
         }
 
+        // choose 2 other random countries to show their capitals as options
         $randomOptions = $this->service->pickRandomCapitals($allCountries, $questionCountry['name'], 2);
 
         return response()->json([
             'country' => $questionCountry['name'],
-            'countryCode' => $questionCountry['iso2'],
             'options' => $this->formatQuestionOptions($quizId, $questionCountry, $randomOptions)
         ]);
     }
@@ -52,14 +52,12 @@ class QuestionController extends Controller
         $options = [
             [
                 'capital' => $questionCountry['capital'],
-                'correct' => true,
             ]
         ];
 
         foreach ($randomOptions as $option) {
             $options[] = [
                 'capital' => $option['capital'] == '' ? 'No capital' : $option['capital'],
-                'correct' => false,
             ];
         }
 
