@@ -11,6 +11,7 @@ use App\Contracts\CountryServiceInterface;
 use Illuminate\Http\Client\RequestException;
 use App\Exceptions\CouldNotGetCapitalsException;
 use App\Exceptions\NoMoreCountriesForQuizException;
+use App\Exceptions\CouldNotGetSingleCountryException;
 
 class CountriesNowService implements CountryServiceInterface
 {
@@ -44,6 +45,27 @@ class CountriesNowService implements CountryServiceInterface
 
         // the request was good, lets cache it now for an hour
         Cache::put('capitals-' . $quizId, $body, Carbon::now()->addHour());
+
+        return $body['data'];
+    }
+
+    public function getSingleCountry(string $country): array
+    {
+        try{
+            $response = $this->adapter->post('capital', [
+                'country' => $country,
+            ]);
+
+            $body = $response->json();
+        } catch (RequestException $ex) {
+            // putting this log here on purpose to look back on, if it fails.
+            Log::error($ex->getMessage());
+            throw new CouldNotGetSingleCountryException($ex->getMessage());
+        }
+
+        if (!$body || $body['error'] || !isset($body['data']['capital'])) {
+            throw new CouldNotGetSingleCountryException();
+        }
 
         return $body['data'];
     }

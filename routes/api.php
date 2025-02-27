@@ -2,6 +2,9 @@
 
 use App\Http\Controllers\Api\QuestionController;
 
-Route::prefix('api')->group(function () {
-    Route::get('quiz/{quizId}/question', [QuestionController::class, 'get']);
-});
+Route::get('quiz/{quizId}/question', [QuestionController::class, 'get'])
+    ->name('api.quiz.question');
+
+Route::post('selection/validate',
+    [\App\Http\Controllers\Api\SelectionValidationController::class, 'validate'])
+    ->name('api.selection.validate');

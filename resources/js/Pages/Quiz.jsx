@@ -6,20 +6,19 @@ import PrimaryButton from "@/Components/PrimaryButton.jsx"
 
 export default function Quiz ({quizId}) {
 
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [data, setData] = useState([])
     const [selected, setSelected] = useState(null)
-    const [error, setError] = useState(true)
+    const [error, setError] = useState(false)
+    const [userHasChosen, setUserHasChosen] = useState(false)
+    const [correct, setCorrect] = useState(false)
 
     useEffect(() => {
         getNextQuestion()
     }, []);
 
     const getNextQuestion = function () {
-        setLoading(true)
-        setData([])
-        setSelected(null)
-        setError(false)
+        resetState()
         axios.get('api/quiz/' + quizId + '/question')
             .then(response => {
                 // check if we're being redirected
@@ -37,22 +36,46 @@ export default function Quiz ({quizId}) {
             })
     }
 
+    function resetState () {
+        setLoading(true)
+        setData([])
+        setSelected(null)
+        setError(false)
+        setUserHasChosen(false)
+        setCorrect(false)
+    }
+
     const setSelectedAnswer = function(value) {
+        if (userHasChosen) {
+            return
+        }
+
+        setLoading(true)
+        setUserHasChosen(true)
         setSelected(value)
+        axios.post('/api/selection/validate/', {
+            country: data.country,
+            capital: value
+        }).then(response => {
+            setCorrect(response.data.correct)
+            // purposefully setting the loading state here instead of in finally
+            // as finally was firing too quickly
+            setLoading(false)
+        }).catch(error => {
+            setError(true)
+            // purposefully setting the loading state here instead of in finally
+            // as finally was firing too quickly
+            setLoading(false)
+        })
+
     }
 
     function selectedOptionIsCorrect() {
-        if (!selected) {
+        if (loading|| !userHasChosen || !selected) {
             return false
         }
 
-        // match against prop options
-        let match = data.options.find(option => option.capital == selected)
-        if (!match) {
-            return false
-        }
-
-        return match.correct
+        return userHasChosen && correct && !error
     }
 
     return (
@@ -91,16 +114,16 @@ export default function Quiz ({quizId}) {
                             <div className="mx-auto px-6 lg:px-8">
                                 <div className={'py-6 text-gray-900 border-b flex cursor-pointer ' +
                                     (selectedOptionIsCorrect() && selected == option.capital ? 'bg-green-400 ' : ' ') +
-                                    (!selected || !selectedOptionIsCorrect() ? 'hover:bg-gray-100': '')
+                                    (!selectedOptionIsCorrect() ? 'hover:bg-gray-100': '')
                                 }
                                      onClick={() => setSelectedAnswer(option.capital)}
                                 >
                                     <div className="flex justify-between grow">
                                         <span className="ml-6">{option.capital}</span>
-                                        {selected && selected == option.capital && <span className="mr-5 md:mr-12">
-                                            {option.correct && "Correct  ✅"}
+                                        {userHasChosen && selected == option.capital && <span className="mr-5 md:mr-12">
+                                            {!loading && userHasChosen && correct && "Correct  ✅"}
 
-                                            {!option.correct && "Not quite, try again!"}
+                                            {!loading && userHasChosen && !correct && "Better Luck next time ❌"}
                                         </span>}
                                     </div>
 

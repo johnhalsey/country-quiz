@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Session;
 use App\Exceptions\CouldNotGetCapitalsException;
 use App\Exceptions\NoMoreCountriesForQuizException;
+use App\Exceptions\CouldNotGetSingleCountryException;
 
 class CountriesNowTest extends TestCase
 {
@@ -265,5 +266,76 @@ class CountriesNowTest extends TestCase
 
         $service = App::make(CountriesNowService::class);
         $service->pickCountryForQuiz($quizId, $countries);
+    }
+
+    public function test_it_will_throw_exception_if_cannot_get_single_country()
+    {
+        $this->expectException(CouldNotGetSingleCountryException::class);
+
+        Http::fake([
+            '*' => Http::response([], 500)
+        ]);
+
+        $service = App::make(CountriesNowService::class);
+        $service->getSingleCountry('United Kingdom');
+    }
+
+    public function test_it_will_throw_exception_getting_single_country_if_response_error_is_true()
+    {
+        $this->expectException(CouldNotGetSingleCountryException::class);
+
+        Http::fake([
+            '*' => Http::response([
+                'error' => true
+            ])
+        ]);
+
+        $service = App::make(CountriesNowService::class);
+        $service->getSingleCountry('United Kingdom');
+    }
+
+    public function test_it_will_throw_exception_getting_single_country_if_data_key_not_set()
+    {
+        $this->expectException(CouldNotGetSingleCountryException::class);
+
+        Http::fake([
+            '*' => Http::response([
+                'error' => false
+            ])
+        ]);
+
+        $service = App::make(CountriesNowService::class);
+        $service->getSingleCountry('United Kingdom');
+    }
+
+    public function test_it_will_throw_exception_getting_single_country_if_capital_key_not_set()
+    {
+        $this->expectException(CouldNotGetSingleCountryException::class);
+
+        Http::fake([
+            '*' => Http::response([
+                'error' => false,
+                'data' => []
+            ])
+        ]);
+
+        $service = App::make(CountriesNowService::class);
+        $service->getSingleCountry('United Kingdom');
+    }
+
+    public function test_it_will_return_json_data_on_success()
+    {
+        Http::fake([
+            '*' => Http::response([
+                'error' => false,
+                'data' => [
+                    'capital' => 'Alger',
+                ]
+            ])
+        ]);
+
+        $service = App::make(CountriesNowService::class);
+        $response = $service->getSingleCountry('United Kingdom');
+        $this->assertSame('Alger', $response['capital']);
     }
 }
