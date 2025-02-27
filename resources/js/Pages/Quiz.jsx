@@ -133,7 +133,9 @@ export default function Quiz ({quizId}) {
                     ))}
 
                     <div className="px-6 lg:px-8 mt-12 flex justify-between">
-                        <PrimaryButton onClick={getNextQuestion}>Next Question</PrimaryButton>
+                        <PrimaryButton
+                            disabled={!userHasChosen}
+                            onClick={getNextQuestion}>Next Question</PrimaryButton>
                     </div>
                 </div>
 
