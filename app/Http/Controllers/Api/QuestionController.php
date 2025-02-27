@@ -18,14 +18,15 @@ class QuestionController extends Controller
 
     public function get(Request $request, $quizId): JsonResponse
     {
-
         try{
+            // try and get all the countries from the service
             $allCountries = $this->service->getAllCountries($quizId);
         } catch (CouldNotGetCapitalsException $e){
             abort(500, 'Could not get capitals');
         }
 
         try{
+            // get one country for the next question, that has not already been used before.
             $questionCountry = $this->service->pickCountryForQuiz($quizId, $allCountries);
         } catch (NoMoreCountriesForQuizException $e){
             // send the user to the complete page

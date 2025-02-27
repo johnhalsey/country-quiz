@@ -64,6 +64,7 @@ class CountriesNowService implements CountryServiceInterface
         }
 
         if (!$body || $body['error'] || !isset($body['data']['capital'])) {
+            // the response format was not good to work with
             throw new CouldNotGetSingleCountryException();
         }
 
@@ -77,10 +78,12 @@ class CountriesNowService implements CountryServiceInterface
         // filter out any countries already used in this quiz
         if (Session::has($quizId)) {
             for ($i = 0; $i < count($countries); $i++) {
+                // if the country is already in the session, remove it
                 if (in_array($countries[$i]['name'], Session::get($quizId))) {
                     $keysToUnset[] = $i;
                     continue;
                 }
+                // if the country capital is blank, remove it
                 if ($countries[$i]['capital'] == '') {
                     $keysToUnset[] = $i;
                 }
@@ -98,13 +101,17 @@ class CountriesNowService implements CountryServiceInterface
         }
 
         shuffle($countries);
+
+        // send back the first one
         return $countries[0];
     }
 
     public function pickRandomCapitals(array $cuntries, string $exludingCountry, int $count = 2): array
     {
+        // find random capital cities (but not ones for this question's country)
         for ($i = 0; $i < count($cuntries); $i++) {
             if ($cuntries[$i]['name'] == $exludingCountry) {
+                // we found this country, remove it, and stop the loop
                 unset($cuntries[$i]);
                 break;
             }

@@ -18,11 +18,13 @@ class SelectionValidationController extends Controller
     public function validate(MakeSelectionRequestion $request): JsonResponse
     {
         try {
+            // try and get the data for this one specirfic country
             $country = $this->service->getSingleCountry(Str::lower($request->input('country')));
         } catch (CouldNotGetSingleCountryException $ex) {
             abort(500, 'Could not get single country');
         }
 
+        // compare the country's capital with the captial submitted by the user
         $correct = Str::lower($country['capital']) === Str::lower($request->input('capital'));
 
         return response()->json([
