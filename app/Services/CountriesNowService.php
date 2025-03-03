@@ -106,20 +106,20 @@ class CountriesNowService implements CountryServiceInterface
         return $countries[0];
     }
 
-    public function pickRandomCapitals(array $cuntries, string $exludingCountry, int $count = 2): array
+    public function pickRandomCapitals(array $countries, string $exludingCountry, int $count = 2): array
     {
         // find random capital cities (but not ones for this question's country)
-        for ($i = 0; $i < count($cuntries); $i++) {
-            if ($cuntries[$i]['name'] == $exludingCountry) {
+        for ($i = 0; $i < count($countries); $i++) {
+            if ($countries[$i]['name'] == $exludingCountry) {
                 // we found this country, remove it, and stop the loop
-                unset($cuntries[$i]);
+                unset($countries[$i]);
                 break;
             }
 
         }
 
-        shuffle($cuntries);
-        return array_slice($cuntries, 0, $count, true);
+        shuffle($countries);
+        return array_slice($countries, 0, $count, true);
     }
 
 }
