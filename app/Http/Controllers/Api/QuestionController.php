@@ -28,7 +28,7 @@ class QuestionController extends Controller
         try{
             // get one country for the next question, that has not already been used before.
             $questionCountry = $this->service->pickCountryForQuiz($quizId, $allCountries);
-        } catch (NoMoreCountriesForQuizException $e){
+        } catch (NoMoreCountriesForQuizException){
             // send the user to the complete page
             return response()->json([
                 'redirect' => route('quiz.complete', $quizId)

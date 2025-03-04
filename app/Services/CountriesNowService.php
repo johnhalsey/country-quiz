@@ -60,7 +60,7 @@ class CountriesNowService implements CountryServiceInterface
         } catch (RequestException $ex) {
             // putting this log here on purpose to look back on, if it fails.
             Log::error($ex->getMessage());
-            throw new CouldNotGetSingleCountryException($ex->getMessage());
+            throw new CouldNotGetSingleCountryException();
         }
 
         if (!$body || $body['error'] || !isset($body['data']['capital'])) {

@@ -6,7 +6,7 @@ use Illuminate\Support\Str;
 use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
 use App\Contracts\CountryServiceInterface;
-use App\Http\Requests\MakeSelectionRequestion;
+use App\Http\Requests\MakeSelectionRequest;
 use App\Exceptions\CouldNotGetSingleCountryException;
 
 class SelectionValidationController extends Controller
@@ -15,12 +15,12 @@ class SelectionValidationController extends Controller
     {
     }
 
-    public function validate(MakeSelectionRequestion $request): JsonResponse
+    public function validate(MakeSelectionRequest $request): JsonResponse
     {
         try {
             // try and get the data for this one specirfic country
             $country = $this->service->getSingleCountry(Str::lower($request->input('country')));
-        } catch (CouldNotGetSingleCountryException $ex) {
+        } catch (CouldNotGetSingleCountryException) {
             abort(500, 'Could not get single country');
         }
 
